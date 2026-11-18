@@ -1,0 +1,24 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/lims
+    username: lims
+    password: lims
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+  mvc:
+    problemdetails:
+      enabled: true
+
+lims:
+  users:
+    analyst:
+      password: "{noop}analyst"
+      roles: [ANALYST]
+    reviewer:
+      password: "{noop}reviewer"
+      roles: [REVIEWER]
+    lead:
+      password: "{noop}lead"
+      roles: [ANALYST, REVIEWER]

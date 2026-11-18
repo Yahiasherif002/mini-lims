@@ -1,0 +1,10 @@
+{
+  "code": "PARA-500",
+  "name": "Paracetamol 500 mg tablets",
+  "specs": [
+    {"testCode": "ASSAY", "testName": "Assay", "unit": "%", "min": 95.0, "max": 105.0},
+    {"testCode": "DISSOLUTION", "testName": "Dissolution (30 min)", "unit": "%", "min": 80},
+    {"testCode": "LOD", "testName": "Loss on drying", "unit": "% w/w", "max": 0.5},
+    {"testCode": "HARDNESS", "testName": "Hardness", "unit": "N", "min": 40, "max": 120}
+  ]
+}

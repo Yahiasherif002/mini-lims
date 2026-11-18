@@ -1,0 +1,129 @@
+<jasperReport name="CertificateOfAnalysis" pageWidth="595" pageHeight="842" columnWidth="515" leftMargin="40" rightMargin="40" topMargin="40" bottomMargin="40">
+	<style name="Base" default="true" fontName="DejaVu Sans" fontSize="10.0"/>
+	<style name="Label" fontName="DejaVu Sans" fontSize="10.0" bold="true" forecolor="#183652"/>
+	<style name="Header" fontName="DejaVu Sans" fontSize="10.0" bold="true" forecolor="#FFFFFF" backcolor="#183652" mode="Opaque" vTextAlign="Middle"/>
+	<parameter name="sampleNumber" class="java.lang.String"/>
+	<parameter name="product" class="java.lang.String"/>
+	<parameter name="batchNumber" class="java.lang.String"/>
+	<parameter name="registered" class="java.lang.String"/>
+	<parameter name="approved" class="java.lang.String"/>
+	<parameter name="conclusion" class="java.lang.String"/>
+	<field name="test" class="java.lang.String"/>
+	<field name="unit" class="java.lang.String"/>
+	<field name="specification" class="java.lang.String"/>
+	<field name="result" class="java.lang.String"/>
+	<field name="status" class="java.lang.String"/>
+	<title height="150">
+		<element kind="staticText" x="0" y="0" width="515" height="28" fontSize="18.0" bold="true" forecolor="#183652" hTextAlign="Center">
+			<text><![CDATA[Certificate of Analysis]]></text>
+		</element>
+		<element kind="line" x="0" y="34" width="515" height="1" forecolor="#8CA3B8"/>
+		<element kind="staticText" x="0" y="46" width="110" height="18" style="Label">
+			<text><![CDATA[Sample number]]></text>
+		</element>
+		<element kind="textField" x="110" y="46" width="405" height="18">
+			<expression><![CDATA[$P{sampleNumber}]]></expression>
+		</element>
+		<element kind="staticText" x="0" y="64" width="110" height="18" style="Label">
+			<text><![CDATA[Product]]></text>
+		</element>
+		<element kind="textField" x="110" y="64" width="405" height="18">
+			<expression><![CDATA[$P{product}]]></expression>
+		</element>
+		<element kind="staticText" x="0" y="82" width="110" height="18" style="Label">
+			<text><![CDATA[Batch]]></text>
+		</element>
+		<element kind="textField" x="110" y="82" width="405" height="18">
+			<expression><![CDATA[$P{batchNumber}]]></expression>
+		</element>
+		<element kind="staticText" x="0" y="100" width="110" height="18" style="Label">
+			<text><![CDATA[Registered]]></text>
+		</element>
+		<element kind="textField" x="110" y="100" width="405" height="18">
+			<expression><![CDATA[$P{registered}]]></expression>
+		</element>
+		<element kind="staticText" x="0" y="118" width="110" height="18" style="Label">
+			<text><![CDATA[Approved]]></text>
+		</element>
+		<element kind="textField" x="110" y="118" width="405" height="18">
+			<expression><![CDATA[$P{approved}]]></expression>
+		</element>
+	</title>
+	<columnHeader height="22">
+		<element kind="staticText" x="0" y="0" width="185" height="22" style="Header">
+			<text><![CDATA[Test]]></text>
+			<box leftPadding="6"/>
+		</element>
+		<element kind="staticText" x="185" y="0" width="60" height="22" style="Header">
+			<text><![CDATA[Unit]]></text>
+			<box leftPadding="6"/>
+		</element>
+		<element kind="staticText" x="245" y="0" width="120" height="22" style="Header">
+			<text><![CDATA[Specification]]></text>
+			<box leftPadding="6"/>
+		</element>
+		<element kind="staticText" x="365" y="0" width="80" height="22" style="Header">
+			<text><![CDATA[Result]]></text>
+			<box leftPadding="6"/>
+		</element>
+		<element kind="staticText" x="445" y="0" width="70" height="22" style="Header">
+			<text><![CDATA[Status]]></text>
+			<box leftPadding="6"/>
+		</element>
+	</columnHeader>
+	<detail>
+		<band height="20">
+			<element kind="textField" x="0" y="0" width="185" height="20" vTextAlign="Middle">
+				<expression><![CDATA[$F{test}]]></expression>
+				<box leftPadding="6">
+					<bottomPen lineWidth="0.5" lineColor="#C8D2DC"/>
+				</box>
+			</element>
+			<element kind="textField" x="185" y="0" width="60" height="20" vTextAlign="Middle">
+				<expression><![CDATA[$F{unit}]]></expression>
+				<box leftPadding="6">
+					<bottomPen lineWidth="0.5" lineColor="#C8D2DC"/>
+				</box>
+			</element>
+			<element kind="textField" x="245" y="0" width="120" height="20" vTextAlign="Middle">
+				<expression><![CDATA[$F{specification}]]></expression>
+				<box leftPadding="6">
+					<bottomPen lineWidth="0.5" lineColor="#C8D2DC"/>
+				</box>
+			</element>
+			<element kind="textField" x="365" y="0" width="80" height="20" vTextAlign="Middle">
+				<expression><![CDATA[$F{result}]]></expression>
+				<box leftPadding="6">
+					<bottomPen lineWidth="0.5" lineColor="#C8D2DC"/>
+				</box>
+			</element>
+			<element kind="textField" x="445" y="0" width="70" height="20" vTextAlign="Middle" bold="true" forecolor="#1E7B34">
+				<printWhenExpression><![CDATA["Pass".equals($F{status})]]></printWhenExpression>
+				<expression><![CDATA[$F{status}]]></expression>
+				<box leftPadding="6">
+					<bottomPen lineWidth="0.5" lineColor="#C8D2DC"/>
+				</box>
+			</element>
+			<element kind="textField" x="445" y="0" width="70" height="20" vTextAlign="Middle" bold="true" forecolor="#B00020">
+				<printWhenExpression><![CDATA["OOS".equals($F{status})]]></printWhenExpression>
+				<expression><![CDATA[$F{status}]]></expression>
+				<box leftPadding="6">
+					<bottomPen lineWidth="0.5" lineColor="#C8D2DC"/>
+				</box>
+			</element>
+		</band>
+	</detail>
+	<summary height="80">
+		<element kind="textField" x="0" y="18" width="515" height="20" fontSize="11.0" bold="true">
+			<expression><![CDATA[$P{conclusion}]]></expression>
+		</element>
+		<element kind="staticText" x="0" y="44" width="515" height="30" forecolor="#46525E" fontSize="8.0">
+			<text><![CDATA[NLT = not less than, NMT = not more than. Results were entered, reviewed and approved in Mini LIMS; every change is recorded in the audit trail.]]></text>
+		</element>
+	</summary>
+	<pageFooter height="20">
+		<element kind="textField" x="0" y="4" width="515" height="14" forecolor="#46525E" fontSize="8.0" hTextAlign="Right">
+			<expression><![CDATA[$P{sampleNumber} + "  |  Page " + $V{PAGE_NUMBER}]]></expression>
+		</element>
+	</pageFooter>
+</jasperReport>
