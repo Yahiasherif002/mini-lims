@@ -49,8 +49,12 @@ class TestResult {
 
     String specification() {
         if (minLimit != null && maxLimit != null) {
-            return minLimit.toPlainString() + " - " + maxLimit.toPlainString();
+            return text(minLimit) + " - " + text(maxLimit);
         }
-        return minLimit != null ? "NLT " + minLimit.toPlainString() : "NMT " + maxLimit.toPlainString();
+        return minLimit != null ? "NLT " + text(minLimit) : "NMT " + text(maxLimit);
+    }
+
+    static String text(BigDecimal number) {
+        return number.stripTrailingZeros().toPlainString();
     }
 }

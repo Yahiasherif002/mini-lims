@@ -49,7 +49,7 @@ class CoaReport {
                         "test", r.testName,
                         "unit", r.unit,
                         "specification", r.specification(),
-                        "result", r.value.toPlainString(),
+                        "result", TestResult.text(r.value),
                         "status", r.outOfSpec ? "OOS" : "Pass"))
                 .toList();
         return JasperFillManager.fillReport(template, parameters, new JRMapCollectionDataSource(rows));

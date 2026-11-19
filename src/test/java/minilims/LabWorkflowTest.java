@@ -95,8 +95,8 @@ class LabWorkflowTest {
                         AuditView::reason)
                 .containsExactly(
                         tuple("SAMPLE_REGISTERED", null, null, "analyst", "Registered for batch B-2611"),
-                        tuple("RESULT_ENTERED", null, "98.0", "analyst", "Initial entry"),
-                        tuple("RESULT_CHANGED", "98.0", "99.0", "lead", "Recalculated after a dilution error"));
+                        tuple("RESULT_ENTERED", null, "98", "analyst", "Initial entry"),
+                        tuple("RESULT_CHANGED", "98", "99", "lead", "Recalculated after a dilution error"));
         assertThat(lab.audit(number)).allSatisfy(event -> assertThat(event.at()).isNotNull());
     }
 
@@ -193,8 +193,8 @@ class LabWorkflowTest {
         assertThat(new String(pdf, 0, 5, StandardCharsets.US_ASCII)).isEqualTo("%PDF-");
 
         var text = transaction.execute(status -> certificateText(number));
-        assertThat(text).contains("Certificate of Analysis", number, "B-2611", "Assay", "95.0 - 105.0", "NLT 80",
-                "NMT 0.5", "99.0", "Pass", "The batch complies with the specification.", "by reviewer");
+        assertThat(text).contains("Certificate of Analysis", number, "B-2611", "Assay", "95 - 105", "NLT 80",
+                "NMT 0.5", "99", "Pass", "The batch complies with the specification.", "by reviewer");
     }
 
     @Test

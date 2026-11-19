@@ -208,5 +208,7 @@ CI runs both on every push.
 - One sample per batch and one result per test; replicates and retests would need a result history per test.
 - The CSV parser splits on commas and does not handle quoted fields, which instrument exports rarely use.
 - Electronic signatures (re-entering a password to approve) are not implemented.
+- Values are stored as numbers, so trailing zeros are not kept (98.0 is shown as 98) on either database. A full LIMS
+  would store a reporting precision for each test.
 - The search index is updated after each commit; if Elasticsearch was down at that moment, the sample is re-indexed on
   its next change.

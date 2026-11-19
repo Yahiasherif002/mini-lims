@@ -213,7 +213,7 @@ public class LabService {
         }
         result.record(value, user);
         log(sample, result.testCode, old == null ? "RESULT_ENTERED" : "RESULT_CHANGED",
-                old == null ? null : old.toPlainString(), value.toPlainString(), user,
+                old == null ? null : TestResult.text(old), TestResult.text(value), user,
                 isBlank(reason) ? "Initial entry" : reason);
         changed(sample);
     }
