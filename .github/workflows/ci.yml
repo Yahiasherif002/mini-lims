@@ -13,5 +13,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Run the tests against PostgreSQL
+      - name: Run the tests against PostgreSQL and Elasticsearch
         run: docker compose run --rm tests
+
+  oracle:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run the same tests against Oracle Database 23ai
+        run: docker compose --profile oracle run --rm tests-oracle

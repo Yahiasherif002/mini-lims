@@ -17,6 +17,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import minilims.LabService.AuditView;
@@ -34,6 +35,8 @@ import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.server.ResponseStatusException;
@@ -235,6 +238,53 @@ class LabWorkflowTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.imported").value(1))
                 .andExpect(jsonPath("$.errors").isEmpty());
+    }
+
+    @Test
+    void searchFindsSamplesByProductStatusAndOutOfSpecificationTest() throws Exception {
+        var number = registeredSample();
+        var suffix = lab.sample(number).productCode().substring("PARA-".length());
+        lab.enterResult(number, "DISSOLUTION", new BigDecimal("70"), null, "analyst");
+
+        mvc.perform(get("/api/samples/search").param("q", suffix + " DISSOLUTION").with(httpBasic("analyst", "analyst")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].number").value(number))
+                .andExpect(jsonPath("$[0].status").value("IN_TESTING"))
+                .andExpect(jsonPath("$[0].outOfSpec[0]").value("DISSOLUTION"));
+        mvc.perform(get("/api/samples/search").param("q", suffix + " ASSAY").with(httpBasic("analyst", "analyst")))
+                .andExpect(jsonPath("$.length()").value(0));
+
+        lab.enterResult(number, "ASSAY", new BigDecimal("99.0"), null, "analyst");
+        lab.enterResult(number, "LOD", new BigDecimal("0.2"), null, "analyst");
+        lab.review(number, APPROVE, "Approved with OOS investigation reference", "reviewer");
+
+        mvc.perform(get("/api/samples/search").param("q", suffix + " APPROVED").with(httpBasic("reviewer", "reviewer")))
+                .andExpect(jsonPath("$[0].number").value(number))
+                .andExpect(jsonPath("$[0].status").value("APPROVED"));
+    }
+
+    @Test
+    void keycloakTokensMapRealmRolesAndTheUsername() {
+        var jwt = Jwt.withTokenValue("token").header("alg", "RS256").subject("0b6f6f3e-keycloak-user-id")
+                .claim("preferred_username", "analyst")
+                .claim("realm_access", Map.of("roles", List.of("ANALYST", "offline_access")))
+                .build();
+
+        var authentication = SecurityConfig.keycloakTokens().convert(jwt);
+
+        assertThat(authentication.getName()).isEqualTo("analyst");
+        assertThat(authentication.getAuthorities()).extracting(GrantedAuthority::getAuthority)
+                .contains("ROLE_ANALYST").doesNotContain("ROLE_REVIEWER");
+    }
+
+    @Test
+    void kubernetesProbesArePublic() throws Exception {
+        mvc.perform(get("/actuator/health/readiness"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("UP"));
+        mvc.perform(get("/actuator/health/liveness"))
+                .andExpect(status().isOk());
     }
 
     private String registeredSample() {

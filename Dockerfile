@@ -8,4 +8,5 @@ RUN mvn -B -q -DskipTests package
 FROM eclipse-temurin:21-jre
 COPY --from=build /src/target/mini-lims-1.0.0.jar /app.jar
 EXPOSE 8080
+USER 10001
 ENTRYPOINT ["java", "-jar", "/app.jar"]

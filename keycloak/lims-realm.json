@@ -1,0 +1,54 @@
+{
+  "realm": "lims",
+  "enabled": true,
+  "roles": {
+    "realm": [
+      {"name": "ANALYST", "description": "Registers samples and enters results"},
+      {"name": "REVIEWER", "description": "Defines products and reviews results"}
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "lims-api",
+      "name": "Mini LIMS",
+      "enabled": true,
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": true,
+      "redirectUris": ["http://localhost:*"],
+      "webOrigins": ["+"]
+    }
+  ],
+  "users": [
+    {
+      "username": "analyst",
+      "enabled": true,
+      "email": "analyst@lims.local",
+      "emailVerified": true,
+      "firstName": "Lab",
+      "lastName": "Analyst",
+      "credentials": [{"type": "password", "value": "analyst", "temporary": false}],
+      "realmRoles": ["ANALYST"]
+    },
+    {
+      "username": "reviewer",
+      "enabled": true,
+      "email": "reviewer@lims.local",
+      "emailVerified": true,
+      "firstName": "QA",
+      "lastName": "Reviewer",
+      "credentials": [{"type": "password", "value": "reviewer", "temporary": false}],
+      "realmRoles": ["REVIEWER"]
+    },
+    {
+      "username": "lead",
+      "enabled": true,
+      "email": "lead@lims.local",
+      "emailVerified": true,
+      "firstName": "Lab",
+      "lastName": "Lead",
+      "credentials": [{"type": "password", "value": "lead", "temporary": false}],
+      "realmRoles": ["ANALYST", "REVIEWER"]
+    }
+  ]
+}

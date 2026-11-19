@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mini-lims
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: mini-lims
+  template:
+    metadata:
+      labels:
+        app: mini-lims
+    spec:
+      securityContext:
+        runAsNonRoot: true
+      containers:
+        - name: mini-lims
+          image: mini-lims:1.0.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://postgres:5432/lims
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef: {name: lims-db, key: username}
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef: {name: lims-db, key: password}
+          readinessProbe:
+            httpGet: {path: /actuator/health/readiness, port: 8080}
+            initialDelaySeconds: 20
+            periodSeconds: 5
+          livenessProbe:
+            httpGet: {path: /actuator/health/liveness, port: 8080}
+            initialDelaySeconds: 40
+            periodSeconds: 10
+          resources:
+            requests: {cpu: 250m, memory: 512Mi}
+            limits: {memory: 768Mi}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mini-lims
+spec:
+  selector:
+    app: mini-lims
+  ports:
+    - port: 8080

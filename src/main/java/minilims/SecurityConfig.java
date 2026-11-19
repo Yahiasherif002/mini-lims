@@ -1,7 +1,9 @@
 package minilims;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -11,9 +13,14 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -30,13 +37,33 @@ class SecurityConfig {
     }
 
     @Bean
-    SecurityFilterChain api(HttpSecurity http) throws Exception {
-        return http
+    SecurityFilterChain api(HttpSecurity http, ObjectProvider<JwtDecoder> keycloak) throws Exception {
+        http
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(requests -> requests.anyRequest().authenticated())
-                .httpBasic(Customizer.withDefaults())
-                .build();
+                .authorizeHttpRequests(requests -> requests
+                        .requestMatchers("/actuator/health/**").permitAll()
+                        .anyRequest().authenticated())
+                .httpBasic(Customizer.withDefaults());
+        if (keycloak.getIfAvailable() != null) {
+            http.oauth2ResourceServer(server -> server.jwt(jwt -> jwt.jwtAuthenticationConverter(keycloakTokens())));
+        }
+        return http.build();
+    }
+
+    static JwtAuthenticationConverter keycloakTokens() {
+        var converter = new JwtAuthenticationConverter();
+        converter.setPrincipalClaimName("preferred_username");
+        converter.setJwtGrantedAuthoritiesConverter(SecurityConfig::realmRoles);
+        return converter;
+    }
+
+    static Collection<GrantedAuthority> realmRoles(Jwt jwt) {
+        Map<String, Object> realm = jwt.getClaimAsMap("realm_access");
+        if (realm == null || !(realm.get("roles") instanceof Collection<?> roles)) {
+            return List.of();
+        }
+        return roles.stream().map(role -> (GrantedAuthority) new SimpleGrantedAuthority("ROLE_" + role)).toList();
     }
 
     @Bean

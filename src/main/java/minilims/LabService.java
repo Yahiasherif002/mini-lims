@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,12 +54,15 @@ public class LabService {
     private final SampleRepository samples;
     private final AuditEventRepository audit;
     private final CoaReport coaReport;
+    private final ApplicationEventPublisher events;
 
-    LabService(ProductRepository products, SampleRepository samples, AuditEventRepository audit, CoaReport coaReport) {
+    LabService(ProductRepository products, SampleRepository samples, AuditEventRepository audit, CoaReport coaReport,
+               ApplicationEventPublisher events) {
         this.products = products;
         this.samples = samples;
         this.audit = audit;
         this.coaReport = coaReport;
+        this.events = events;
     }
 
     public void createProduct(ProductRequest request) {
@@ -102,7 +106,7 @@ public class LabService {
         product.specs.forEach(spec -> sample.results.add(TestResult.from(spec, sample)));
         samples.save(sample);
         log(sample, null, "SAMPLE_REGISTERED", null, null, user, "Registered for batch " + batchNumber);
-        return view(sample);
+        return changed(sample);
     }
 
     @Transactional(readOnly = true)
@@ -180,7 +184,7 @@ public class LabService {
             sample.approvedAt = Instant.now();
             log(sample, null, "SAMPLE_APPROVED", null, null, user, isBlank(reason) ? "Approved" : reason);
         }
-        return view(sample);
+        return changed(sample);
     }
 
     @Transactional(readOnly = true)
@@ -211,6 +215,13 @@ public class LabService {
         log(sample, result.testCode, old == null ? "RESULT_ENTERED" : "RESULT_CHANGED",
                 old == null ? null : old.toPlainString(), value.toPlainString(), user,
                 isBlank(reason) ? "Initial entry" : reason);
+        changed(sample);
+    }
+
+    private SampleView changed(Sample sample) {
+        var view = view(sample);
+        events.publishEvent(view);
+        return view;
     }
 
     private Sample find(String number) {

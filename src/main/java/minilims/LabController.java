@@ -43,9 +43,11 @@ public class LabController {
     }
 
     private final LabService lab;
+    private final SampleSearch search;
 
-    LabController(LabService lab) {
+    LabController(LabService lab, SampleSearch search) {
         this.lab = lab;
+        this.search = search;
     }
 
     @PostMapping("/products")
@@ -61,6 +63,11 @@ public class LabController {
     @ResponseStatus(HttpStatus.CREATED)
     public SampleView registerSample(@Valid @RequestBody SampleRequest request, Principal user) {
         return lab.registerSample(request.productCode(), request.batchNumber(), user.getName());
+    }
+
+    @GetMapping("/samples/search")
+    public List<SampleSearch.SampleDocument> search(@RequestParam @NotBlank String q) {
+        return search.find(q);
     }
 
     @GetMapping("/samples/{number}")
